@@ -12,6 +12,8 @@ library(readr)
 library(readxl)
 ```
 
+# Data read-in
+
 ```{r data readin}
 load("Dataset-Military-Aid-and-Recipient-State-Cooperation-091310 (4).RData")
 import <- read_csv("TIV-Import-All-2000-2019.csv", col_types = cols(
@@ -26,5 +28,18 @@ russia <- read_csv("TIV-Export-RUS-2000-2019.csv", col_types = cols(
   .default = col_double(),
   Country = col_character()
 ))
+
+russia <- russia[-92, ]
+usa <- usa[-130, ]
+import <- import[-201, ]
+
+russia <- russia %>% pivot_longer(`2000`:`2019`, names_to = "year", values_to = "Russia") %>%
+  select(-Total)
+
+usa <- usa %>% pivot_longer(`2000`:`2019`, names_to = "year", values_to = "USA") %>%
+  select(-Total)
+
+import <- import %>% pivot_longer(`2000`:`2019`, names_to = "year", values_to = "Full") %>%
+  select(-Total)
 ```
 
