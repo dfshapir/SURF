@@ -7,5 +7,11 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(readr)
+```
+
+```{r input}
+load("Dataset-Military-Aid-and-Recipient-State-Cooperation-091310 (4).RData")
 ```
 
