@@ -65,5 +65,7 @@ recent <- fulldata %>%
   filter(Year %in% c("2015", "2016", "2017", "2018", "2019"))  %>%
   filter(RussiaPct >= 2) %>%
   filter(USPct >= 2)
+
+recent <- recent[-c(27:31), ]
 ```
 
