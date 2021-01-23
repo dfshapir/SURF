@@ -69,3 +69,7 @@ recent <- fulldata %>%
 recent <- recent[-c(27:31), ]
 ```
 
+```{r}
+recent
+```
+
