@@ -33,13 +33,37 @@ russia <- russia[-92, ]
 usa <- usa[-130, ]
 import <- import[-201, ]
 
-russia <- russia %>% pivot_longer(`2000`:`2019`, names_to = "year", values_to = "Russia") %>%
+russia <- russia %>% pivot_longer(`2000`:`2019`, names_to = "Year", values_to = "Russia") %>%
   select(-Total)
 
-usa <- usa %>% pivot_longer(`2000`:`2019`, names_to = "year", values_to = "USA") %>%
+usa <- usa %>% pivot_longer(`2000`:`2019`, names_to = "Year", values_to = "USA") %>%
   select(-Total)
 
-import <- import %>% pivot_longer(`2000`:`2019`, names_to = "year", values_to = "Full") %>%
+import <- import %>% pivot_longer(`2000`:`2019`, names_to = "Year", values_to = "Full") %>%
   select(-Total)
+
+data <- merge(russia, usa, by = c("Country", "Year"), all = TRUE)
+data[is.na(data)] <- 0
+
+fulldata <- merge(data, import, by = c("Country", "Year"), all = TRUE)
+fulldata[is.na(fulldata)] <- 0
+```
+
+# Full data column setup
+
+```{r}
+fulldata <- fulldata %>% 
+  mutate(RussiaPct = Russia/Full*100) %>%
+  mutate(USPct = USA/Full*100)
+fulldata[is.na(fulldata)] <- 0
+```
+
+# Finding Countries in Last 5 years with Presence of Both Russia and USA
+
+```{r}
+recent <- fulldata %>%
+  filter(Year %in% c("2015", "2016", "2017", "2018", "2019"))  %>%
+  filter(RussiaPct >= 2) %>%
+  filter(USPct >= 2)
 ```
 
