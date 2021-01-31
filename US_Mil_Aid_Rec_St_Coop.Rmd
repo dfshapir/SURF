@@ -10,12 +10,15 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(readr)
 library(readxl)
+library(stringr)
+library(data.table)
 ```
 
 # Data read-in
 
 ```{r data readin}
 load("Dataset-Military-Aid-and-Recipient-State-Cooperation-091310 (4).RData")
+x <- as_data_frame(x)
 
 import <- read_csv("TIV-Import-All-2000-2019.csv", col_types = cols(
   .default = col_double(),
@@ -74,5 +77,11 @@ recent <- recent[-c(27:31), ]
 
 ```{r}
 recent
+```
+
+# Filtering Countries from previous category into U.S. aid data (dataframe x)
+
+```{r}
+specific <- x %>% filter(ccodesrc %in% c(692, 771, 140, 651, 750, 645, 663, 690, 475, 770, 135, 800, 640, 696, 704))
 ```
 
