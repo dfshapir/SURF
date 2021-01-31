@@ -16,14 +16,17 @@ library(readxl)
 
 ```{r data readin}
 load("Dataset-Military-Aid-and-Recipient-State-Cooperation-091310 (4).RData")
+
 import <- read_csv("TIV-Import-All-2000-2019.csv", col_types = cols(
   .default = col_double(),
   Country = col_character()
 ))
+
 usa <- read_csv("TIV-Export-USA-2000-2019.csv", col_types = cols(
   .default = col_double(),
   Country = col_character()
 ))
+
 russia <- read_csv("TIV-Export-RUS-2000-2019.csv", col_types = cols(
   .default = col_double(),
   Country = col_character()
