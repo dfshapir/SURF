@@ -79,9 +79,27 @@ recent <- recent[-c(27:31), ]
 recent
 ```
 
-# Filtering Countries from previous category into U.S. aid data (dataframe x)
+# Filtering Countries from previous category into U.S. aid data (dataframe x); writing to new CSV for further use in Excel
 
 ```{r}
 specific <- x %>% filter(ccodesrc %in% c(692, 771, 140, 651, 750, 645, 663, 690, 475, 770, 135, 800, 640, 696, 704))
+
+specific <- specific[ ,1:19]
+
+# You don't need to do this; I just did this so that I could add data in Excel rather than in R. I will read in the updated CSV in the next code chunk and label it something different to avoid confusion. 
+
+write.csv(specific, "specific.csv", row.names = FALSE)
+```
+
+# Opening and Reading in Polity V Scores
+
+```{r}
+polity <- read_xls("p5v2018.xls") 
+```
+
+```{r}
+polity <- polity %>%
+  filter(year %in% c("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")) %>%
+  filter(country %in% c("Peru", "Brazil", "Nigeria", "Turkey", "Iraq", "Egypt", "Jordan", "Kuwait", "Bahrain", "UAE", "Uzbekistan", "India", "Pakistan", "Bangladesh", "Thailand"))
 ```
 
