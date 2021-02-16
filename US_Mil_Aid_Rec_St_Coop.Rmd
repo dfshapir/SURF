@@ -142,16 +142,6 @@ Venezuela <- historic[1756:1764, ]
 lm(data = Venezuela, formula = Russia ~ Year)
 ```
 
-# Filtering Countries from previous category into U.S. aid data (dataframe x); writing to new CSV for further use in Excel
-
-```{r}
-specific <- x %>% filter(ccodesrc %in% c(692, 771, 140, 651, 750, 645, 663, 690, 475, 770, 135, 800, 640, 696, 704))
-
-specific <- specific[ ,1:19]
-
-write.csv(specific, "specific.csv", row.names = FALSE)
-```
-
 ## DEPENDENT VARIABLE
 
 # Reading in and messing with DCAD data
@@ -222,4 +212,14 @@ polity <- polity %>%
   select(c(country, year, polity2))
 
 write.csv(polity, "polity.csv", row.names = FALSE)
+```
+
+# Filtering Countries from previous category into U.S. aid data (dataframe x); writing to new CSV for further use in Excel
+
+```{r}
+specific <- x %>% filter(ccodesrc %in% c(692, 771, 140, 651, 750, 645, 663, 690, 475, 770, 135, 800, 640, 696, 704))
+
+specific <- specific[ ,1:19]
+
+write.csv(specific, "specific.csv", row.names = FALSE)
 ```
