@@ -68,11 +68,13 @@ fulldata[is.na(fulldata)] <- 0
 
 ```{r}
 recent <- fulldata %>%
-  filter(Year %in% c("2015", "2016", "2017", "2018", "2019"))  %>%
+  filter(Year %in% c("2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019"))  %>%
   filter(RussiaPct >= 2) %>%
   filter(USPct >= 2)
+```
 
-recent <- recent[-c(27:31), ]
+```{r}
+recent <- recent[-c(72:81), ]
 ```
 
 ```{r}
@@ -100,6 +102,9 @@ polity <- read_xls("p5v2018.xls")
 ```{r}
 polity <- polity %>%
   filter(year %in% c("1990", "1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998", "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018")) %>%
-  filter(country %in% c("Peru", "Brazil", "Nigeria", "Turkey", "Iraq", "Egypt", "Jordan", "Kuwait", "Bahrain", "UAE", "Uzbekistan", "India", "Pakistan", "Bangladesh", "Thailand"))
+  filter(country %in% c("Peru", "Brazil", "Nigeria", "Turkey", "Iraq", "Egypt", "Jordan", "Kuwait", "Bahrain", "UAE", "Uzbekistan", "India", "Pakistan", "Bangladesh", "Thailand")) %>%
+  select(c(country, year, polity2))
+
+write.csv(polity, "polity.csv", row.names = FALSE)
 ```
 
