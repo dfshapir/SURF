@@ -203,6 +203,8 @@ dyadic <- read_csv("DCAD-v1.0-dyadic.csv", col_types = cols(
 ```{r}
 mylogit <- glm(data = dyadic, formula = dcaAnyV1 ~ year, family = "binomial")
 summary(mylogit)
+
+# Coefficients don't look great...
 ```
 
 # ADDITIONAL 
