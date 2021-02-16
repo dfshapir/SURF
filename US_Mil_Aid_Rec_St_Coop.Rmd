@@ -90,118 +90,58 @@ historic <- fulldata %>%
 
 historic$Year = as.numeric(as.character(historic$Year))
 
-# A LOT of basic linear regressions. I went through the data table, took a regression for each country that Russia sold to, looked at the slopes, and kept the ones that were positive.
+# A LOT of basic linear regressions. I went through the data table, took a regression for each country that Russia sold to, looked at the slopes, and kept the ones that were positive. I then removed the ones from this list that the U.S. did not sell any weapons to during this period (Armenia, Croatia, Cyprus, Kenya, Libya, Mongolia, Senegal, Slovenia, Syria, Tajikistan, Turkmenistan, Uzbekistan, Vietnam).
 
 Afghanistan <- historic[1:9, ]
 lm(data = Afghanistan, formula = Russia ~ Year)
-
 Algeria <- historic[28:36, ]
 lm(data = Algeria, formula = Russia ~ Year)
-
-Armenia <- historic[55:63, ]
-lm(data = Armenia, formula = Russia ~ Year)
-
 Azerbaijan <- historic[82:90, ]
 lm(data = Azerbaijan, formula = Russia ~ Year)
-
 Brazil <- historic[190:198, ]
 lm(data = Brazil, formula = Russia ~ Year)
-
 Chad <- historic[280:288, ]
 lm(data = Chad, formula = Russia ~ Year)
-
-Croatia <- historic[352:360, ]
-lm(data = Croatia, formula = Russia ~ Year)
-
-Cyprus <- historic[370:378, ]
-lm(data = Cyprus, formula = Russia ~ Year)
-
 Ecuador <- historic[433:441, ]
 lm(data = Ecuador, formula = Russia ~ Year)
-
 Egypt <- historic[442:450, ]
 lm(data = Egypt, formula = Russia ~ Year)
-
 India <- historic[667:675, ]
 lm(data = India, formula = Russia ~ Year)
-
 Indonesia <- historic[676:684, ]
 lm(data = Indonesia, formula = Russia ~ Year)
-
 Iraq <- historic[694:702, ]
 lm(data = Iraq, formula = Russia ~ Year)
-
 Jordan <- historic[748:756, ]
 lm(data = Jordan, formula = Russia ~ Year)
-
 Kazakhstan <- historic[757:765, ]
 lm(data = Kazakhstan, formula = Russia ~ Year)
-
-Kenya <- historic[766:774, ]
-lm(data = Kenya, formula = Russia ~ Year)
-
 Kuwait <- historic[784:792, ]
 lm(data = Kuwait, formula = Russia ~ Year)
-
-Libya <- historic[847:855, ]
-lm(data = Libya, formula = Russia ~ Year)
-
 Malaysia <- historic[937:945, ]
 lm(data = Malaysia, formula = Russia ~ Year)
-
 Mexico <- historic[991:999, ]
 lm(data = Mexico, formula = Russia ~ Year)
-
 Mongolia <- historic[1000:1008, ]
 lm(data = Mongolia, formula = Russia ~ Year)
-
 Morocco <- historic[1018:1026, ]
 lm(data = Morocco, formula = Russia ~ Year)
-
 Nicaragua <- historic[1090:1098, ]
 lm(data = Nicaragua, formula = Russia ~ Year)
-
 Niger <- historic[1099:1107, ]
 lm(data = Niger, formula = Russia ~ Year)
-
 Peru <- historic[1225:1233, ]
 lm(data = Peru, formula = Russia ~ Year)
-
 Poland <- historic[1261:1269, ]
 lm(data = Poland, formula = Russia ~ Year)
-
-Senegal <- historic[1342:1350, ]
-lm(data = Senegal, formula = Russia ~ Year)
-
-Slovenia <- historic[1396:1404, ]
-lm(data = Slovenia, formula = Russia ~ Year)
-
-Syria <- historic[1504:1512, ]
-lm(data = Syria, formula = Russia ~ Year)
-
-Tajikistan <- historic[1531:1539, ]
-lm(data = Tajikistan, formula = Russia ~ Year)
-
 Thailand <- historic[1549:1557, ]
 lm(data = Thailand, formula = Russia ~ Year)
-
 Turkey <- historic[1612:1620, ]
 lm(data = Turkey, formula = Russia ~ Year)
-
-Turkmenistan <- historic[1621:1629, ]
-lm(data = Turkmenistan, formula = Russia ~ Year)
-
 UAE <- historic[1639:1647, ]
 lm(data = UAE, formula = Russia ~ Year)
-
-Uzbekistan <- historic[1747:1755, ]
-lm(data = Uzbekistan, formula = Russia ~ Year)
-
 Venezuela <- historic[1756:1764, ]
 lm(data = Venezuela, formula = Russia ~ Year)
-
-Vietnam <- historic[1765:1773, ]
-lm(data = Vietnam, formula = Russia ~ Year)
 ```
 
 # Filtering Countries from previous category into U.S. aid data (dataframe x); writing to new CSV for further use in Excel
