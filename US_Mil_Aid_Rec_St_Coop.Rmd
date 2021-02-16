@@ -122,8 +122,6 @@ Malaysia <- historic[937:945, ]
 lm(data = Malaysia, formula = Russia ~ Year)
 Mexico <- historic[991:999, ]
 lm(data = Mexico, formula = Russia ~ Year)
-Mongolia <- historic[1000:1008, ]
-lm(data = Mongolia, formula = Russia ~ Year)
 Morocco <- historic[1018:1026, ]
 lm(data = Morocco, formula = Russia ~ Year)
 Nicaragua <- historic[1090:1098, ]
@@ -190,9 +188,24 @@ dyadic <- read_csv("DCAD-v1.0-dyadic.csv", col_types = cols(
   dcaAnyV1 = col_double(),
   dcaAnyV2 = col_double()
 )) %>%
-  filter(year %in% c(1991:2010)) %>%
-  filter(abbrev1 %in% c("USA", "RUS"))
+  filter(year %in% c(2002:2010)) %>%
+  filter(abbrev1 == "USA") %>%
+  dplyr::select(c(abbrev1, abbrev2, year, dcaAnyV1, dcaAnyV2)) %>%
+  
+# Separating into the countries that we got through the independent variable
+  
+  filter(abbrev2 %in% c("MEX", "NIC", "VEN", "ECU", "PER", "BRA", "POL", "AZE", "NIR", "CHA", "ALG", "MOR", "TUR", "IRQ", "EGY", "JOR", "KUW", "UAE", "AFG", "KZK", "IND", "THI", "MAL", "INS")) %>%
+  filter(year %in% c("2002", "2010"))
 ```
+
+# Logistic Regression
+
+```{r}
+mylogit <- glm(data = dyadic, formula = dcaAnyV1 ~ year, family = "binomial")
+summary(mylogit)
+```
+
+# ADDITIONAL 
 
 # Opening and Reading in Polity V Scores
 
