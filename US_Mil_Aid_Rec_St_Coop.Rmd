@@ -197,6 +197,56 @@ summary(mylogit)
 # Coefficients don't look great...
 ```
 
+# Comparing subset to greater whole
+
+```{r}
+fulldyadic <- read_csv("DCAD-v1.0-dyadic.csv", col_types = cols(
+  ccode1 = col_double(),
+  abbrev1 = col_character(),
+  ccode2 = col_double(),
+  abbrev2 = col_character(),
+  year = col_double(),
+  dcaGeneralV1 = col_double(),
+  dcaGeneralV2 = col_double(),
+  dcaSectorV1 = col_double(),
+  dcaSectorV2 = col_double(),
+  dcaAnyV1 = col_double(),
+  dcaAnyV2 = col_double()
+)) %>%
+  filter(year %in% c(2002:2010)) %>%
+  filter(abbrev1 == "USA") %>%
+  dplyr::select(c(abbrev1, abbrev2, year, dcaAnyV1, dcaAnyV2)) %>%
+  filter(year %in% c("2002", "2010"))
+
+fulllogit <- glm(data = fulldyadic, formula = dcaAnyV1 ~ year, family = "binomial")
+summary(fulllogit)
+
+# There's really not much of a difference between the "all countries" set and the subset. The coefficient is smaller, but so is the standard error. I believe this is just because there are more data points to analyze, so it gets a bit more exact.
+```
+
+# UN Votes
+
+```{r readin}
+unvotes <- read_csv("UNVotes.csv", col_types = cols(
+  .default = col_double(),
+  Country = col_character(),
+  Countryname = col_character(),
+  date = col_character(),
+  unres = col_character(),
+  short = col_character(),
+  descr = col_character()
+))
+
+load("AgreementScoresAll_Apr2020.Rdata")
+```
+
+```{r}
+unvotes$year <- as.numeric(as.character(unvotes$year))
+
+unvotes <- unvotes %>%
+  filter(year >= 2002)
+```
+
 # ADDITIONAL 
 
 # Opening and Reading in Polity V Scores
@@ -223,3 +273,25 @@ specific <- specific[ ,1:19]
 
 write.csv(specific, "specific.csv", row.names = FALSE)
 ```
+
+```{r}
+dyadread <- read_csv("DCAD-v1.0-dyadic.csv", col_types = cols(
+  ccode1 = col_double(),
+  abbrev1 = col_character(),
+  ccode2 = col_double(),
+  abbrev2 = col_character(),
+  year = col_double(),
+  dcaGeneralV1 = col_double(),
+  dcaGeneralV2 = col_double(),
+  dcaSectorV1 = col_double(),
+  dcaSectorV2 = col_double(),
+  dcaAnyV1 = col_double(),
+  dcaAnyV2 = col_double()
+)) %>%
+  filter(year %in% c(2002:2019)) %>%
+  filter(abbrev1 == "USA") %>%
+  dplyr::select(c(abbrev1, abbrev2, year, dcaAnyV1, dcaAnyV2))
+
+write.csv(dyadread, "dyadread.csv", row.names = FALSE)
+```
+
