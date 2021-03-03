@@ -7,5 +7,58 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(readxl)
+library(readr)
+library(stringr)
+library(data.table)
+library(stats)
+```
+
+# Data read-in, changing NAs where it makes sense to
+
+```{r}
+stata <- read_xlsx("Full_dataset from STATA.xlsx") %>%
+  filter(year != 2019)
+stata$usaexport[is.na(stata$usaexport)] <- 0
+stata$rusexp[is.na(stata$rusexp)] <- 0
+stata$mil_aid_const[is.na(stata$mil_aid_const)] <- 0
+stata$econ_aid_const[is.na(stata$econ_aid_const)] <- 0
+stata$logUS[is.na(stata$logUS)] <- 0
+stata$logRU[is.na(stata$logRU)] <- 0
+stata$ru_growth[is.na(stata$ru_growth)] <- 0
+stata$logmilaid[is.na(stata$logmilaid)] <- 0
+stata$log_econ_aid[is.na(stata$log_econ_aid)] <- 0
+```
+
+```{r}
+doModel <- function(stata) lm(rusexp ~ year, stata)
+democModel <- function(stata) lm(democ_score ~ year, stata)
+milModel <- function(stata) lm(mil_aid_const ~ year, stata)
+econModel <- function(stata) lm(econ_aid_const ~ year, stata)
+getSlope <- function(mod) coef(mod)[2]
+
+stata2 <- stata %>% 
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, doModel)) %>%
+  mutate(arms_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(arms_slope) %>%
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, milModel)) %>%
+  mutate(mil_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(mil_slope) %>%
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, econModel)) %>%
+  mutate(econ_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(econ_slope)
 ```
 
