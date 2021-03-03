@@ -59,6 +59,9 @@ stata2 <- stata %>%
   mutate(econ_slope = map(model, getSlope)) %>%
   unnest(data) %>%
   select(-model) %>%
-  unnest(econ_slope)
+  unnest(econ_slope) %>%
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, democModel))
 ```
 
