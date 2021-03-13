@@ -37,10 +37,12 @@ stata$log_econ_aid[is.na(stata$log_econ_aid)] <- 0
 # Set up functions
 
 doModel <- function(stata) lm(rusexp ~ year, stata)
+usModel <- function(stata) lm(usaexport ~ year, stata)
 democModel <- function(stata) lm(democ_score ~ year, stata)
 milModel <- function(stata) lm(mil_aid_const ~ year, stata)
 econModel <- function(stata) lm(econ_aid_const ~ year, stata)
 idealModel <- function(stata) lm(idealpointdistance ~ year, stata)
+gdpModel <- function(stata) lm(gdp_const ~ year, stata)
 getSlope <- function(mod) coef(mod)[2]
 
 trends <- stata %>% 
@@ -54,6 +56,13 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(arms_slope) %>%
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, usModel)) %>%
+  mutate(usarms_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(usarms_slope) %>%
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, milModel)) %>%
@@ -89,18 +98,20 @@ trends <- stata %>%
 
 # Select out the necessary variables 
   
-  select(country, year, cow, arms_slope, econ_slope, mil_slope, ideal_slope, democ_slope) %>%
+  select(country, cow, arms_slope, usarms_slope, econ_slope, mil_slope, ideal_slope, democ_slope) %>%
 
 # Dividing slopes by 1,000,000 so it's more even
   
   mutate(econ_slope = (econ_slope/1000000)) %>%
   mutate(mil_slope = (mil_slope/1000000))
+
+write.csv(trends, "trends.csv", row.names = FALSE)
 ```
 
 # Setting up regression
 
 ```{r}
-regression <- lm(data = trends, formula = ideal_slope ~ arms_slope + econ_slope + mil_slope + democ_slope)
+regression <- lm(data = trends, formula = ideal_slope ~ arms_slope + mil_slope + democ_slope + gdp_slope + usarms_slope)
 
 summary(regression)
 ```
