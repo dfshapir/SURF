@@ -44,6 +44,7 @@ econModel <- function(stata) lm(econ_aid_const ~ year, stata)
 idealModel <- function(stata) lm(idealpointdistance ~ year, stata)
 gdpModel <- function(stata) lm(gdp_const ~ year, stata)
 oilModel <- function(stata) lm(us_oil_import ~ year, stata)
+corrupModel <- function(stata) lm(cc_rank ~ year, stata)
 getSlope <- function(mod) coef(mod)[2]
 
 trends <- stata %>% 
@@ -53,10 +54,10 @@ trends <- stata %>%
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, doModel)) %>%
-  mutate(arms_slope = map(model, getSlope)) %>%
+  mutate(rusarms_slope = map(model, getSlope)) %>%
   unnest(data) %>%
   select(-model) %>%
-  unnest(arms_slope) %>%
+  unnest(rusarms_slope) %>%
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, usModel)) %>%
@@ -99,6 +100,13 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(oil_slope) %>%
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, corrupModel)) %>%
+  mutate(corrup_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(corrup_slope) %>%
 
 # Now, we only need one year. I chose 2018, because why not. They should all have the same values.
   
@@ -106,7 +114,7 @@ trends <- stata %>%
 
 # Select out the necessary variables 
   
-  select(country, cow, arms_slope, usarms_slope, econ_slope, mil_slope, ideal_slope, democ_slope, oil_slope) %>%
+  select(country, cow, rusarms_slope, usarms_slope, econ_slope, mil_slope, ideal_slope, democ_slope, oil_slope, corrup_slope) %>%
 
 # Dividing slopes by 1,000,000 so it's more even
   
@@ -119,7 +127,7 @@ write.csv(trends, "trends.csv", row.names = FALSE)
 # Setting up regression
 
 ```{r}
-regression <- lm(data = trends, formula = ideal_slope ~ arms_slope + mil_slope + democ_slope + usarms_slope + oil_slope)
+regression <- lm(data = trends, formula = ideal_slope ~ rusarms_slope + mil_slope + democ_slope + usarms_slope + oil_slope + corrup_slope)
 
 summary(regression)
 ```
