@@ -111,7 +111,12 @@ trends <- stata %>%
 # Now, we only need one year. I chose 2018, because why not. They should all have the same values.
   
   filter(year == 2018) %>%
-
+  
+# I am filtering out countries where the U.S. or Russia do not export to. 
+  
+  filter(usarms_slope != 0) %>%
+  filter(rusarms_slope != 0) %>%
+  
 # Select out the necessary variables 
   
   select(country, cow, rusarms_slope, usarms_slope, econ_slope, mil_slope, ideal_slope, democ_slope, oil_slope, corrup_slope) %>%
