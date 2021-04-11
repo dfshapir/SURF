@@ -14,6 +14,7 @@ library(readr)
 library(stringr)
 library(data.table)
 library(stats)
+library(stargazer)
 ```
 
 # Data read-in, changing NAs where it makes sense to
@@ -131,97 +132,13 @@ write.csv(trends, "trends.csv", row.names = FALSE)
 
 # Setting up regression
 
-```{r}
-regression <- lm(data = trends, formula = ideal_slope ~ rusarms_slope + mil_slope + democ_slope + usarms_slope + oil_slope + corrup_slope)
+```{r results = 'asis'}
+regression <- lm(data = trends, formula = ideal_slope ~ rusarms_slope + econ_slope + democ_slope + mil_slope + oil_slope + corrup_slope)
 
 summary(regression)
+
+stargazer(regression, title = "OLS Regression Measuring Relationships in Trends (2002-2018) of Relevant Variables", type = "html")
 ```
 
-# Seeing what happens during adversarial sanctions period
 
-```{r}
-sanctions <- read_xlsx("Full_dataset from STATA.xlsx") %>%
-  filter(year %in% 2015:2018)
-sanctions$usaexport[is.na(sanctions$usaexport)] <- 0
-sanctions$rusexp[is.na(sanctions$rusexp)] <- 0
-sanctions$mil_aid_const[is.na(sanctions$mil_aid_const)] <- 0
-sanctions$econ_aid_const[is.na(sanctions$econ_aid_const)] <- 0
-sanctions$logUS[is.na(sanctions$logUS)] <- 0
-sanctions$logRU[is.na(sanctions$logRU)] <- 0
-sanctions$ru_growth[is.na(sanctions$ru_growth)] <- 0
-sanctions$logmilaid[is.na(sanctions$logmilaid)] <- 0
-sanctions$log_econ_aid[is.na(sanctions$log_econ_aid)] <- 0
-
-# Set up functions
-
-doModel2 <- function(sanctions) lm(rusexp ~ year, sanctions)
-democModel2 <- function(sanctions) lm(democ_score ~ year, sanctions)
-milModel2 <- function(sanctions) lm(mil_aid_const ~ year, sanctions)
-econModel2 <- function(sanctions) lm(econ_aid_const ~ year, sanctions)
-idealModel2 <- function(sanctions) lm(idealpointdistance ~ year, sanctions)
-getSlope2 <- function(mod) coef(mod)[2]
-
-trends2 <- sanctions %>% 
-  
-# Run a ton of nesting and map functions to get trend lines for each country for each variable over the given time period.
-  
-  group_by(country) %>%
-  nest() %>%
-  mutate(model = map(data, doModel2)) %>%
-  mutate(arms_slope = map(model, getSlope2)) %>%
-  unnest(data) %>%
-  select(-model) %>%
-  unnest(arms_slope) %>%
-  group_by(country) %>%
-  nest() %>%
-  mutate(model = map(data, milModel2)) %>%
-  mutate(mil_slope = map(model, getSlope2)) %>%
-  unnest(data) %>%
-  select(-model) %>%
-  unnest(mil_slope) %>%
-  group_by(country) %>%
-  nest() %>%
-  mutate(model = map(data, econModel2)) %>%
-  mutate(econ_slope = map(model, getSlope2)) %>%
-  unnest(data) %>%
-  select(-model) %>%
-  unnest(econ_slope) %>%
-  group_by(country) %>%
-  nest() %>%
-  mutate(model = map(data, democModel2)) %>%
-  mutate(democ_slope = map(model, getSlope2)) %>%
-  unnest(data) %>%
-  select(-model) %>%
-  unnest(democ_slope) %>%
-  group_by(country) %>%
-  nest() %>%
-  mutate(model = map(data, idealModel2)) %>%
-  mutate(ideal_slope = map(model, getSlope2)) %>%
-  unnest(data) %>%
-  select(-model) %>%
-  unnest(ideal_slope) %>%
-
-# Now, we only need one year. I chose 2018, because why not. They should all have the same values.
-  
-  filter(year == 2018) %>%
-
-# Select out the necessary variables 
-  
-  select(country, year, cow, arms_slope, econ_slope, mil_slope, ideal_slope, democ_slope) %>%
-
-# Dividing slopes by 1,000,000 so it's more even
-  
-  mutate(econ_slope = (econ_slope/1000000)) %>%
-  mutate(mil_slope = (mil_slope/1000000))
-```
-
-# Setting up second regression
-
-```{r}
-regression2 <- lm(data = trends2, formula = ideal_slope ~ arms_slope + econ_slope + mil_slope + democ_slope)
-
-summary(regression2)
-
-# This is not a good regression. 
-```
 
