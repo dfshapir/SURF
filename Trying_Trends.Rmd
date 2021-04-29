@@ -38,9 +38,12 @@ stata$log_econ_aid[is.na(stata$log_econ_aid)] <- 0
 # Set up functions
 
 doModel <- function(stata) lm(rusexp ~ year, stata)
+logdoModel <- function(stata) lm(logRU ~ year, stata)
 usModel <- function(stata) lm(usaexport ~ year, stata)
+logusModel <- function(stata) lm(logUS ~ year, stata)
 democModel <- function(stata) lm(democ_score ~ year, stata)
 milModel <- function(stata) lm(mil_aid_const ~ year, stata)
+logmilModel <- function(stata) lm(logmilaid ~ year, stata)
 econModel <- function(stata) lm(econ_aid_const ~ year, stata)
 idealModel <- function(stata) lm(idealpointdistance ~ year, stata)
 gdpModel <- function(stata) lm(gdp_const ~ year, stata)
@@ -59,6 +62,15 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(rusarms_slope) %>%
+  
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, logdoModel)) %>%
+  mutate(logrusarms_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(logrusarms_slope) %>%
+ 
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, usModel)) %>%
@@ -66,6 +78,15 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(usarms_slope) %>%
+  
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, logusModel)) %>%
+  mutate(logusarms_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(logusarms_slope) %>% 
+  
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, milModel)) %>%
@@ -73,6 +94,15 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(mil_slope) %>%
+  
+  group_by(country) %>%
+  nest() %>%
+  mutate(model = map(data, logmilModel)) %>%
+  mutate(logmil_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(logmil_slope) %>%
+  
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, econModel)) %>%
@@ -80,6 +110,7 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(econ_slope) %>%
+  
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, democModel)) %>%
@@ -87,6 +118,7 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(democ_slope) %>%
+  
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, idealModel)) %>%
@@ -94,6 +126,7 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(ideal_slope) %>%
+  
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, oilModel)) %>%
@@ -101,6 +134,7 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(oil_slope) %>%
+  
   group_by(country) %>%
   nest() %>%
   mutate(model = map(data, corrupModel)) %>%
@@ -108,32 +142,28 @@ trends <- stata %>%
   unnest(data) %>%
   select(-model) %>%
   unnest(corrup_slope) %>%
-
-# Now, we only need one year. I chose 2018, because why not. They should all have the same values.
-  
-  filter(year == 2018) %>%
   
 # I am filtering out countries where the U.S. or Russia do not export to. 
   
-  filter(usarms_slope != 0) %>%
-  filter(rusarms_slope != 0) %>%
+filter(usarms_slope != 0) %>%
+filter(rusarms_slope != 0) %>%
   
 # Select out the necessary variables 
   
-  select(country, cow, rusarms_slope, usarms_slope, econ_slope, mil_slope, ideal_slope, democ_slope, oil_slope, corrup_slope) %>%
-
-# Dividing slopes by 1,000,000 so it's more even
-  
-  mutate(econ_slope = (econ_slope/1000000)) %>%
-  mutate(mil_slope = (mil_slope/1000000))
+  select(country, cow, rusarms_slope, logrusarms_slope, usarms_slope, logusarms_slope, logmil_slope, ideal_slope, democ_slope, oil_slope, corrup_slope)
 
 write.csv(trends, "trends.csv", row.names = FALSE)
+```
+
+```{r}
+ggplot(trends, aes(x = usarms_slope)) +
+  geom_histogram(bins = 10)
 ```
 
 # Setting up regression
 
 ```{r results = 'asis'}
-regression <- lm(data = trends, formula = ideal_slope ~ rusarms_slope + econ_slope + democ_slope + mil_slope + oil_slope + corrup_slope)
+regression <- lm(data = trends, formula = ideal_slope ~ logrusarms_slope + logusarms_slope + democ_slope + logmil_slope + oil_slope + corrup_slope)
 
 summary(regression)
 
