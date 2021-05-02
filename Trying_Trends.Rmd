@@ -47,11 +47,16 @@ logmilModel <- function(stata) lm(logmilaid ~ year, stata)
 econModel <- function(stata) lm(econ_aid_const ~ year, stata)
 idealModel <- function(stata) lm(idealpointdistance ~ year, stata)
 gdpModel <- function(stata) lm(gdp_const ~ year, stata)
+loggdpModel <- function(stata) lm(loggdp ~ year, stata)
 oilModel <- function(stata) lm(us_oil_import ~ year, stata)
 corrupModel <- function(stata) lm(cc_rank ~ year, stata)
 getSlope <- function(mod) coef(mod)[2]
 
 trends <- stata %>% 
+  
+# Filtered out North Korea; functions throw a lot of NAs and we don't even use North Korea in the end anyway. Easier to cut it out now so that the regressions can actually run.
+  
+  filter(country != "North Korea") %>%
   
 # Run a ton of nesting and map functions to get trend lines for each country for each variable over the given time period.
   
@@ -113,6 +118,14 @@ trends <- stata %>%
   
   group_by(country) %>%
   nest() %>%
+  mutate(model = map(data, loggdpModel)) %>%
+  mutate(loggdp_slope = map(model, getSlope)) %>%
+  unnest(data) %>%
+  select(-model) %>%
+  unnest(loggdp_slope) %>%
+  
+  group_by(country) %>%
+  nest() %>%
   mutate(model = map(data, democModel)) %>%
   mutate(democ_slope = map(model, getSlope)) %>%
   unnest(data) %>%
@@ -150,7 +163,7 @@ filter(rusarms_slope != 0) %>%
   
 # Select out the necessary variables 
   
-  select(country, cow, rusarms_slope, logrusarms_slope, usarms_slope, logusarms_slope, logmil_slope, ideal_slope, democ_slope, oil_slope, corrup_slope)
+  select(country, year, cow, rusarms_slope, logrusarms_slope, usarms_slope, logusarms_slope, logmil_slope, ideal_slope, loggdp_slope, democ_slope, oil_slope, corrup_slope)
 
 trends <- trends %>%
   rename(
@@ -160,6 +173,7 @@ trends <- trends %>%
     `Slope of US Arms Exp. Log` = logusarms_slope,
     `Slope of US Mil. Aid Log` = logmil_slope,
     `Slope of Ideal Point Trend Line` = ideal_slope,
+    `Slope of GDP Log` = loggdp_slope,
     `Slope of Democracy Trend Line` = democ_slope,
     `Slope of Oil Exp. Trend Line` = oil_slope,
     `Slope of Corruption Contr. Trend Line` = corrup_slope
@@ -171,9 +185,9 @@ write.csv(trends, "trends.csv", row.names = FALSE)
 ```{r results = 'asis'}
 # Setting up regressions
 
-regression <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `Slope of RU Arms Exp. Log` + `Slope of US Arms Exp. Log` + `Slope of US Mil. Aid Log` + `Slope of Democracy Trend Line` + `Slope of Oil Exp. Trend Line` + `Slope of Corruption Contr. Trend Line`)
+regression <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `Slope of RU Arms Exp. Log` + `Slope of US Arms Exp. Log` + `Slope of US Mil. Aid Log` + `Slope of GDP Log` + `Slope of Democracy Trend Line` + `Slope of Oil Exp. Trend Line` + `Slope of Corruption Contr. Trend Line`)
 
-regression2 <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `Slope of RU Arms Exp. Trend Line` + `Slope of US Arms Exp. Trend Line` + `Slope of US Mil. Aid Log` + `Slope of Democracy Trend Line` + `Slope of Oil Exp. Trend Line` + `Slope of Corruption Contr. Trend Line`)
+regression2 <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `Slope of RU Arms Exp. Trend Line` + `Slope of US Arms Exp. Trend Line` + `Slope of US Mil. Aid Log` + `Slope of GDP Log` + `Slope of Democracy Trend Line` + `Slope of Oil Exp. Trend Line` + `Slope of Corruption Contr. Trend Line`)
 
 stargazer(regression2, regression, title = "OLS Regression Measuring Relationships in Trends (2002-2018) of Relevant Variables", type = "html")
 ```
