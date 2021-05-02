@@ -155,19 +155,14 @@ filter(rusarms_slope != 0) %>%
 write.csv(trends, "trends.csv", row.names = FALSE)
 ```
 
-```{r}
-ggplot(trends, aes(x = usarms_slope)) +
-  geom_histogram(bins = 10)
-```
-
-# Setting up regression
+# Setting up regressions
 
 ```{r results = 'asis'}
 regression <- lm(data = trends, formula = ideal_slope ~ logrusarms_slope + logusarms_slope + democ_slope + logmil_slope + oil_slope + corrup_slope)
 
-summary(regression)
+regression2 <- lm(data = trends, formula = ideal_slope ~ rusarms_slope + usarms_slope + democ_slope + logmil_slope + oil_slope + corrup_slope)
 
-stargazer(regression, title = "OLS Regression Measuring Relationships in Trends (2002-2018) of Relevant Variables", type = "html")
+stargazer(regression, regression2, title = "OLS Regression Measuring Relationships in Trends (2002-2018) of Relevant Variables", type = "html")
 ```
 
 
