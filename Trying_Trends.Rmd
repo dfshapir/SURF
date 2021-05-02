@@ -17,9 +17,9 @@ library(stats)
 library(stargazer)
 ```
 
+```{r}
 # Data read-in, changing NAs where it makes sense to
 
-```{r}
 stata <- read_xlsx("Full_dataset from STATA.xlsx") %>%
   filter(year != 2019)
 stata$usaexport[is.na(stata$usaexport)] <- 0
@@ -152,15 +152,28 @@ filter(rusarms_slope != 0) %>%
   
   select(country, cow, rusarms_slope, logrusarms_slope, usarms_slope, logusarms_slope, logmil_slope, ideal_slope, democ_slope, oil_slope, corrup_slope)
 
+trends <- trends %>%
+  rename(
+    `Slope of RU Arms Exp. Trend Line` = rusarms_slope,
+    `Slope of US Arms Exp. Trend Line` = usarms_slope,
+    `Slope of RU Arms Exp. Log` = logrusarms_slope,
+    `Slope of US Arms Exp. Log` = logusarms_slope,
+    `Slope of US Mil. Aid Log` = logmil_slope,
+    `Slope of Ideal Point Trend Line` = ideal_slope,
+    `Slope of Democracy Trend Line` = democ_slope,
+    `Slope of Oil Exp. Trend Line` = oil_slope,
+    `Slope of Corruption Contr. Trend Line` = corrup_slope
+  )
+
 write.csv(trends, "trends.csv", row.names = FALSE)
 ```
 
+```{r results = 'asis'}
 # Setting up regressions
 
-```{r results = 'asis'}
-regression <- lm(data = trends, formula = ideal_slope ~ logrusarms_slope + logusarms_slope + democ_slope + logmil_slope + oil_slope + corrup_slope)
+regression <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `Slope of RU Arms Exp. Log` + `Slope of US Arms Exp. Log` + `Slope of US Mil. Aid Log` + `Slope of Democracy Trend Line` + `Slope of Oil Exp. Trend Line` + `Slope of Corruption Contr. Trend Line`)
 
-regression2 <- lm(data = trends, formula = ideal_slope ~ rusarms_slope + usarms_slope + democ_slope + logmil_slope + oil_slope + corrup_slope)
+regression2 <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `Slope of RU Arms Exp. Trend Line` + `Slope of US Arms Exp. Trend Line` + `Slope of US Mil. Aid Log` + `Slope of Democracy Trend Line` + `Slope of Oil Exp. Trend Line` + `Slope of Corruption Contr. Trend Line`)
 
 stargazer(regression, regression2, title = "OLS Regression Measuring Relationships in Trends (2002-2018) of Relevant Variables", type = "html")
 ```
