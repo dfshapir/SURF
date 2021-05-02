@@ -175,7 +175,7 @@ regression <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `S
 
 regression2 <- lm(data = trends, formula = `Slope of Ideal Point Trend Line` ~ `Slope of RU Arms Exp. Trend Line` + `Slope of US Arms Exp. Trend Line` + `Slope of US Mil. Aid Log` + `Slope of Democracy Trend Line` + `Slope of Oil Exp. Trend Line` + `Slope of Corruption Contr. Trend Line`)
 
-stargazer(regression, regression2, title = "OLS Regression Measuring Relationships in Trends (2002-2018) of Relevant Variables", type = "html")
+stargazer(regression2, regression, title = "OLS Regression Measuring Relationships in Trends (2002-2018) of Relevant Variables", type = "html")
 ```
 
 
