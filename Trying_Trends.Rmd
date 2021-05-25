@@ -163,7 +163,7 @@ filter(rusarms_slope != 0) %>%
   
 # Select out the necessary variables 
   
-  select(country, year, cow, rusarms_slope, logrusarms_slope, usarms_slope, logusarms_slope, logmil_slope, ideal_slope, loggdp_slope, democ_slope, oil_slope, corrup_slope)
+  select(country, year, rusarms_slope, logrusarms_slope, usarms_slope, logusarms_slope, logmil_slope, ideal_slope, loggdp_slope, democ_slope, oil_slope, corrup_slope)
 
 trends <- trends %>%
   rename(
